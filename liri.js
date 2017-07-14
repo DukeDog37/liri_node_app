@@ -14,7 +14,7 @@ switch(process.argv[2])
 {
 
 	case "my-tweets":
-		console.log("my-tweets");
+		//console.log("my-tweets");
 		//* This will show your last 20 tweets and when they were created at in your terminal/bash window.
 		fnGetTweets();
 		break;
@@ -44,13 +44,6 @@ function fnGetTweets(){
 	var Twitter = require('twitter');
  	var myTwitterKeys = require("./keys.js");
 	var keys = myTwitterKeys.twitterKeys;
-
-
-	/*for (var key in keys) {
-	  if (keys.hasOwnProperty(key)) {
-	    console.log(key + " -> " + keys[key]);
-	  }
-	}*/
 	var client = new Twitter({
 	  consumer_key: keys['consumer_key'],
 	  consumer_secret: keys['consumer_secret'],
@@ -62,7 +55,14 @@ function fnGetTweets(){
 	var params = {screen_name: 'Champ Toby'};
 	client.get('statuses/user_timeline', params, function(error, tweets, response) {
   	if (!error) {
-    	console.log(tweets);
+    	//console.log(tweets);
+    	//var RecentTweets = JSON.parse(tweets);
+    	for(i=0; i < tweets.length; i++){
+    		console.log(tweets[i].text);
+
+
+    	}
+
   	}
   	else{
   		console.log("error somewhere");
@@ -112,8 +112,8 @@ function fnGetMovieInfo(){
 		    //* IMDB Rating of the movie.
        		console.log(json["imdbRating"]);
        		//* Rotten Tomatoes Rating of the movie.
-       		var ratings = JSON.stringify(json["Ratings"]);
-		    console.log(ratings);
+       		var ratings = json["Ratings"];
+		    console.log("Rotten Tomatoes Rating: " + ratings[1].Value);
        		//* Country where the movie was produced.
        		console.log(json["Country"]);
        		//* Language of the movie.
