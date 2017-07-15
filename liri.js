@@ -20,6 +20,7 @@ switch(process.argv[2])
 		break;
 	case "spotify-this-song":
 		console.log("spotify-this-song");
+		fnSpotify();
 		
 		break;
 	case "movie-this":
@@ -128,4 +129,33 @@ function fnGetMovieInfo(){
 
 
 
+}
+
+function fnSpotify(){
+	
+ 	var mySpotKeys = require("./keys.js");
+	var keys = mySpotKeys.spotifyKeys;
+	var Spotify = require('node-spotify-api');
+ 
+	var spotify = new Spotify({
+	  id: keys['client_id'],
+	  secret: keys['client_secret']
+	});
+ 
+	spotify.search({ type: 'track', query: 'The Sign' }, function(err, data) {
+		  if (err) {
+		    return console.log('Error occurred: ' + err);
+		  }
+		  else{
+		  	console.log(data);
+		  	var firstPage = data.tracks.items;
+  			//console.log('The tracks in the first page are.. (popularity in parentheses)');
+
+			firstPage.forEach(function(track, index) {
+			    //console.log(track.album);
+			    //console.log(track.artists[index].name);
+			    console.log(index + ': ' + track.name + track.preview_url);
+			  });
+			}
+ 	});
 }
