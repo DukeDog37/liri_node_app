@@ -29,8 +29,8 @@ inquirer
     // If the inquirerResponse confirms, we displays the inquirerResponse's username and pokemon from the answers.
     if (inquirerResponse.confirm == true) {
       callAction = inquirerResponse.reqaction;
-      console.log(inquirerResponse.reqaction);
-      console.log(callAction);
+      //console.log(inquirerResponse.reqaction);
+      //console.log(callAction);
 
 			switch(inquirerResponse.reqaction[0])
 			{
@@ -41,7 +41,7 @@ inquirer
 					fnGetTweets(inquirerResponse.username);
 					break;
 				case "spotify-this-song":
-					console.log("spotify-this-song");
+					//console.log("spotify-this-song");
 					inquirer
 						  .prompt([
 						    // Here we create a basic text prompt.
@@ -49,17 +49,35 @@ inquirer
 						      type: "input",
 						      message: "What Song?",
 						      name: "songname"
+						    },
+							{
+						      type: "list",
+						      message: "How many results?",
+						      choices: ["1", "5", "10"],
+						      name: "numResults"
 						    }
 						    ]).then(function(inquirerResponse) {
 						    	//console.log(inquirerResponse.songname)
-						    	fnSpotify(inquirerResponse.songname);
+						    	fnSpotify(inquirerResponse.songname, inquirerResponse.numResults);
 						    });
 					
 					
 					break;
 				case "movie-this":
 					//console.log("movie-this");
-					fnGetMovieInfo();
+					inquirer
+						  .prompt([
+						    // Here we create a basic text prompt.
+						    {
+						      type: "input",
+						      message: "What Movie?",
+						      name: "moviename"
+						    }
+						    ]).then(function(inquirerResponse) {
+						    	//console.log(inquirerResponse.songname)
+						    	fnGetMovieInfo(inquirerResponse.moviename);
+						    });
+					
 					
 					break;
 				case "do-what-it-says":
@@ -77,6 +95,8 @@ inquirer
 		      console.log("\nThat's okay " + inquirerResponse.username + ", come again when you are more sure.\n");
 		    }
 	});
+  
+
 
 
 function fnGetTweets(username){
@@ -115,57 +135,33 @@ function fnGetTweets(username){
 
 }
 
-function fnGetMovieInfo(){
+function fnGetMovieInfo(moviename){
 
 	var nodeArgs = process.argv;
-	var movieName = "";
-
-	for(var i = 2; i < nodeArgs.length; i++){
-
-		if (i > 2 && i < nodeArgs.length){
-			if(movieName === ""){
-				movieName = nodeArgs[i];
-			}
-			else{
-				movieName = movieName + "+" + nodeArgs[i];
-			}
-			
-			
-		}
-	}
 	//Sets Movie default to 'Mr. Nobody' in case one was not entered
-	if (movieName == ""){
-		movieName = "Mr. Nobody";
+	if (moviename == ""){
+		moviename = "Mr. Nobody";
 	}
-		//console.log(movieName);
 		var request = require("request");
 		// Then run a request to the OMDB API with the movie specified
-		var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=40e9cece";
+		var queryUrl = "http://www.omdbapi.com/?t=" + moviename + "&y=&plot=short&apikey=40e9cece";
 		// This line is just to help us debug against the actual URL.
-		//console.log(queryUrl);
 		request(queryUrl, function(error, response, body) {
 		  // If the request was successful...
 		  if (!error && response.statusCode === 200) {
 		    // Then log the body from the site!
 		    var json = JSON.parse(body);
-		    //console.log(json);
-		    //* Title of the movie.
-       		console.log(json["Title"]);
-       		//* Year the movie came out.
-		    console.log(json["Year"]);
-		    //* IMDB Rating of the movie.
-       		console.log(json["imdbRating"]);
-       		//* Rotten Tomatoes Rating of the movie.
-       		var ratings = json["Ratings"];
-		    console.log("Rotten Tomatoes Rating: " + ratings[1].Value);
-       		//* Country where the movie was produced.
-       		console.log(json["Country"]);
-       		//* Language of the movie.
-       		console.log(json["Language"]);
-       		//* Plot of the movie.
-       		console.log(json["Plot"]);
-       		//* Actors in the movie.
-       		console.log(json["Actors"]);
+		    var ratings = json["Ratings"];
+		    	console.log("==================== \n" +
+		    	" Title: " + json["Title"] + "\n" +
+       			" Released in: " + json["Year"] + "\n" +
+		    	" IMDB Rating: " + json["imdbRating"] + "\n" + 
+       		    " Rotten Tomatoes Rating: " + ratings[1].Value + "\n" +
+       		    " Country Released: " + json["Country"] + "\n" +
+       		    " Language: " + json["Language"] + "\n" +
+       		    " Plot: " + json["Plot"] + "\n" +
+       		    " Actors: " + json["Actors"] + "\n" +
+       		    "====================");
 		  }
 		});
 	
@@ -174,7 +170,7 @@ function fnGetMovieInfo(){
 
 }
 
-function fnSpotify(songname){
+function fnSpotify(songname, numResults){
 	var nodeArgs = process.argv;
 	var SongName = songname;
 	//console.log("got herer : " + songname);
@@ -187,24 +183,19 @@ function fnSpotify(songname){
 	  secret: keys['client_secret']
 	});
  
-	spotify.search({ type: 'track', query: SongName }, function(err, data) {
+	spotify.search({ type: 'track', query: SongName, limit: numResults }, function(err, data) {
 		  if (err) {
 		    return console.log('Error occurred: ' + err);
 		  }
 		  else{
-		  	console.log(data);
-		  	var firstPage = data.tracks.items;
-  			//console.log(firstPage);
-  			//var rrr = JSON.stringify(firstPage);
-  			//console.log(rrr);
-			firstPage.forEach(function(track, index) {
-			    console.log(index);
-			    //console.log(track.album.artists[index].name);
-			    //console.log(track.artists[index].name);
-			    //console.log(index + ': Artist: '+ track.album.artists[index].name + 
-			    //	" Track Name: " + track.name + 
-			    //	" Preview Here: " + track.preview_url);
-			    console.log(track.href);
+		  	var firstPageResults = data.tracks.items;
+  			firstPageResults.forEach(function(track, index) {
+			console.log("==================== \n" + 
+			   	" Artist: " + track.artists[0].name + "\n" + 
+			    " Track Name: " + track.name + "\n" + 
+			    " Preview Here: " + track.preview_url + "\n" +
+			    " Track HRef: " + track.href + "\n" + 
+			    "====================");
 			  });
 			}
  	});
