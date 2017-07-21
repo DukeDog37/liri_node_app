@@ -148,8 +148,11 @@ function fnGetMovieInfo(moviename){
 function fnSpotify(songname, numResults){
 	var nodeArgs = process.argv;
 	var SongName = ""
+	var defaultSong = false;
 	if(songname === ""){
-		SongName = "Ace of Base";
+		SongName = "Ace of Base";//use band since song list is static
+		defaultSong = true;
+		numResults = 20;
 	}
 	else{
 		SongName = songname;
@@ -169,15 +172,36 @@ function fnSpotify(songname, numResults){
 		    return console.log('Error occurred: ' + err);
 		  }
 		  else{
-		  	var firstPageResults = data.tracks.items;
-  			firstPageResults.forEach(function(track, index) {
-			console.log("==================== \n" + 
-			   	" Artist: " + track.artists[0].name + "\n" + 
-			    " Track Name: " + track.name + "\n" + 
-			    " Preview Here: " + track.preview_url + "\n" +
-			    " Track HRef: " + track.href + "\n" + 
-			    "====================");
-			  });
+		  	if(defaultSong == true){
+		  		//loop through results and find "Ace of Base", "The Sign"
+		  		//node-spotify-api only has one search function that can
+		  		//search artist OR song but not both
+		  		//use "Ace of Base" as default since their songs are static vs. "the sing"
+		  		//which brings back varying results
+		  		var firstPageResults = data.tracks.items;
+	  			firstPageResults.forEach(function(track, index) {
+					if(track.name == "The Sign"){
+						console.log("==================== \n" + 
+						   	" Artist: " + track.artists[0].name + "\n" + 
+						    " Track Name: " + track.name + "\n" + 
+						    " Preview Here: " + track.preview_url + "\n" +
+						    " Track HRef: " + track.href + "\n" + 
+						    "====================");
+					}  
+				});
+
+		  	}
+		  	else{
+			  	var firstPageResults = data.tracks.items;
+	  			firstPageResults.forEach(function(track, index) {
+				console.log("==================== \n" + 
+				   	" Artist: " + track.artists[0].name + "\n" + 
+				    " Track Name: " + track.name + "\n" + 
+				    " Preview Here: " + track.preview_url + "\n" +
+				    " Track HRef: " + track.href + "\n" + 
+				    "====================");
+				  });
+  				}
 			}
  	});
 }
